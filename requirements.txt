@@ -1,0 +1,33 @@
+# LiveKit Agent Framework
+livekit-agents>=0.8.0
+livekit-plugins-openai>=0.8.0
+livekit-plugins-elevenlabs>=0.8.0
+livekit-plugins-azure>=0.8.0
+livekit-plugins-silero>=0.8.0
+livekit-plugins-noise-cancellation>=0.8.0
+
+# Core dependencies
+python-dotenv>=1.0.0
+asyncio-mqtt>=0.16.0
+requests>=2.31.0
+aiohttp>=3.9.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Logging and monitoring
+structlog>=23.0.0
+prometheus-client>=0.19.0
+
+# Vector database and embeddings
+chromadb>=0.4.0
+openai>=1.0.0
+
+# Audio processing
+soundfile>=0.12.0
+librosa>=0.10.0
+
+# Additional utilities
+pydantic>=2.0.0
+typing-extensions>=4.8.0

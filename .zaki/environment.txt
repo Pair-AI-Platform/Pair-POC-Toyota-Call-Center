@@ -1,0 +1,78 @@
+# SYSTEM INFORMATION
+Operating System: Windows_NT 10.0.26100
+Default Shell: C:\Users\a.elghandour\AppData\Local\Programs\Git\bin\bash.exe
+Home Directory: C:\Users\a.elghandour
+Current Working Directory: c:\Users\a.elghandour\OneDrive - CEQUENS\Desktop\Ceq_Projects\Toyota
+Platform: win32
+Architecture: x64
+Node Version: v22.17.0
+Total Memory: 16GB
+Free Memory: 1GB
+CPU Cores: 12
+
+Current Time: 8/19/2025, 1:14:35 PM (Africa/Cairo, UTC+3:00)
+
+# EDITOR STATE
+
+Visible Files:
+  toyota_livekit_agent.py
+
+Open Tabs:
+  toyota_showrooms_kb.md
+  toyota_service_centers_kb.md
+  toyota_spare_parts_kb.md
+  toyota_rental_kb.md
+  toyota_delivery_centers_kb.md
+  get_client_data_tool.py
+  toyota_kuwait_assistant_prompt.md
+  toyota_tools.py
+  toyota_livekit_agent.py
+  ..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\livekit\plugins\elevenlabs\tts.py
+  README.md
+  .env
+  .env.example
+  requirements.txt
+  create_client_tool.py
+  get_vehicle_data_tool.py
+  toyota_kuwait_assistant_prompt.md
+  get_service_tickets_tool.py
+  create_service_ticket_tool.py
+  toyota_vehicles_sedans_kb.md
+  toyota_vehicles_sports_kb.md
+  toyota_vehicles_suvs_kb.md
+  toyota_vehicles_mpvs_kb.md
+  toyota_vehicles_commercial_kb.md
+  send_car_image_tool.py
+  send_location_tool.py
+
+# WORKSPACE SUMMARY
+
+Important Project Files:
+  README.md
+
+Files:
+  README.md
+  .env
+  .env.example
+  create_client_tool.py
+  create_service_ticket_tool.py
+  get_client_data_tool.py
+  get_service_tickets_tool.py
+  get_vehicle_data_tool.py
+  requirements.txt
+  send_car_image_tool.py
+  send_location_tool.py
+  test_toyota_setup.py
+  toyota_delivery_centers_kb.md
+  toyota_kuwait_assistant_prompt.md
+  toyota_livekit_agent.py
+  toyota_rental_kb.md
+  toyota_service_centers_kb.md
+  toyota_showrooms_kb.md
+  toyota_spare_parts_kb.md
+  toyota_tools.py
+  toyota_vehicles_commercial_kb.md
+  toyota_vehicles_mpvs_kb.md
+  toyota_vehicles_sedans_kb.md
+  toyota_vehicles_sports_kb.md
+  toyota_vehicles_suvs_kb.md
