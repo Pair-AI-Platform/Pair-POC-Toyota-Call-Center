@@ -141,7 +141,7 @@ class ToyotaKuwaitAgent(Agent):
             
             if not phone_number:
                 context.add_system_message("Phone number not available from call system")
-                return "wwwwwwwww"
+                return
 
             # ✅ invoke tool via RunContext (following BurgerKing pattern)
             result = await context.run_tool("get_client_data", phone_number=phone_number)
@@ -166,55 +166,52 @@ class ToyotaKuwaitAgent(Agent):
         try:
             if not self.participant_identity:
                 print("No participant identity available")
-                return "EEEEEEEEEEEE"
-            
+                return None
+
             print(f"Extracting phone from participant identity: {self.participant_identity}")
-            
-            # Method 1: Direct phone number as participant identity
-            if self.participant_identity.startswith('+965'):
-                print(f"Found Kuwait phone number: {self.participant_identity}")
-                return self.participant_identity
-            
-            # Method 2: Look for Kuwait phone number pattern in identity string
+
             import re
-            phone_pattern = r'\+965\d{8}'
+
+            # General pattern to find international phone numbers (e.g., +201033505065)
+            # It will match the first occurrence of a + followed by digits.
+            phone_pattern = r'\+\d+'
             match = re.search(phone_pattern, self.participant_identity)
             if match:
-                phone_number = match.group()
-                print(f"Extracted phone number from identity: {phone_number}")
+                phone_number = match.group(0)
+                print(f"Extracted phone number: {phone_number}")
                 return phone_number
-            
-            # Method 3: Handle cases where identity might be just the number without +965
+
+            # Fallback for Kuwait-specific numbers without country code
             # Check if identity is 8 digits (Kuwait mobile number without country code)
             if re.match(r'^\d{8}$', self.participant_identity):
                 phone_number = f"+965{self.participant_identity}"
-                print(f"Added country code to number: {phone_number}")
+                print(f"Added Kuwait country code to number: {phone_number}")
                 return phone_number
-            
-            # Method 4: Handle cases with different formatting
-            # Remove any non-digit characters and check if it's a valid Kuwait number
+
+            # Handle cases with different formatting (Kuwait specific)
             digits_only = re.sub(r'\D', '', self.participant_identity)
             if digits_only.startswith('965') and len(digits_only) == 11:
                 phone_number = f"+{digits_only}"
-                print(f"Formatted phone number: {phone_number}")
+                print(f"Formatted Kuwait phone number: {phone_number}")
                 return phone_number
             elif len(digits_only) == 8:
                 phone_number = f"+965{digits_only}"
-                print(f"Added country code to digits: {phone_number}")
+                print(f"Added Kuwait country code to digits: {phone_number}")
                 return phone_number
-            
-            print(f"Could not extract valid Kuwait phone number from: {self.participant_identity}")
-            return "WEX"
-            
+
+            print(f"Could not extract a valid phone number from: {self.participant_identity}")
+            return None
+
         except Exception as e:
             print(f"Error extracting phone from caller identity: {e}")
-            return "EEWE"
+            return None
 
     async def _handle_car_image_request(self, message_text, context):
         """Handle car image requests"""
         try:
             if not self.client_phone:
-                return "EEEEEEEE"
+                context.add_system_message("Cannot send car image, client phone number is not available.")
+                return
             car_name = self._extract_car_name(message_text)
             description = self._get_car_description(car_name)
             # ✅ invoke tool via context (following BurgerKing pattern)
@@ -348,11 +345,14 @@ async def entrypoint(ctx: JobContext):
         )
 
         # Tools + agent
-        toyota_tools = ToyotaTools(session=session)
         agent = ToyotaKuwaitAgent(
             session_id=session_id,
             participant_identity=participant.identity,
         )
+        phone_number = agent._extract_phone_from_call_system()
+        toyota_tools = ToyotaTools(session=session, client_phone=phone_number)
+        if phone_number:
+            agent.client_phone = phone_number
         await agent.update_tools([
             toyota_tools.get_client_data,
             toyota_tools.create_client,
@@ -412,6 +412,14 @@ async def entrypoint(ctx: JobContext):
 # ──────────────────────────
 _TOYOTA_SYSTEM_PROMPT = """
 أنت فاطمة، مساعدة افتراضية ماهرة لتويوتا الكويت (محمد ناصر الساير وأولاده). أنت مساعدة صوتية ذكية تعمل عبر المكالمات الهاتفية لخدمة العملاء. دورك هو تقديم ردود موجزة وفعالة للعملاء خلال رحلة مبيعات وخدمة السيارات بضيافة كويتية أصيلة.
+
+## RULE #1: LANGUAGE SYNCHRONIZATION - THIS IS THE MOST IMPORTANT RULE
+**YOUR RESPONSE MUST BE IN THE SAME LANGUAGE AS THE USER'S LAST MESSAGE. THIS OVERRULES EVERYTHING ELSE.**
+- **If the user speaks Arabic, you reply in Arabic ONLY.**
+- **If the user speaks English, you reply in English ONLY.**
+- **If the user switches from Arabic to English, you MUST switch to English.**
+- **If they switch back to Arabic, you MUST switch back to Arabic.**
+- **NEVER mix languages. This is absolutely forbidden.**
 
 ## 🎯 قواعد المكالمات الصوتية - VOICE CALL OPTIMIZATION 🎯
 
@@ -515,6 +523,39 @@ _TOYOTA_SYSTEM_PROMPT = """
 - "توكل على الله" (توكل على الله)
 - "الله يوفقك" (وفقك الله)
 
+**التحيات والمجاملات:**
+- "حياك الله" (Welcome)
+- "وعليكم السلام ورحمة الله وبركاته"
+- "يعطيك العافية" (Thank you/Well done)
+- "الله يعافيك" (Response to يعطيك العافية)
+- "جزاكم الله خير" (May God reward you)
+- "على الرحب والسعة" (You're welcome)
+- "تسلم" (Thanks/Bless you)
+
+**تعبيرات الأعمال الكويتية:**
+- "شرايك؟" (What do you think?)
+- "شلونك؟" (How are you?)
+- "إنشالله" (God willing)
+- "توكل على الله" (Trust in God)
+- "الله يوفقك" (May God grant you success)
+
+**مصطلحات كويتية عامة:**
+- "زين" (Good/Fine)
+- "طيب" (Okay/Good)
+- "تمام" (Perfect/Okay)
+- "صج؟" (Really?)
+- "وايد" (Very/A lot)
+- "شوي" (A little)
+- "باجر" (Tomorrow)
+- "اليوم" (Today)
+- "الحين" (Now)
+
+**حل المشاكل:**
+- "خلاص" (It's done/settled)
+- "ما عليك زود" (No problem at all)
+- "ترا" (You know/By the way)
+- "صدق" (Honestly/Really)
+
 ## مجموعة سيارات تويوتا مع الصور
 ### سيدان
 - **كورولا (Corolla)**: سيدان عائلية، موثوقة
@@ -576,6 +617,7 @@ _TOYOTA_SYSTEM_PROMPT = """
 - توفر قطع الغيار الأصلية
 
 ## السلوكيات المحظورة
+- **🚫 لا تسأل أبداً عن رقم هاتف العميل - يتم الحصول عليه تلقائياً من المكالمة**
 - لا تنصح أبداً بسيارات غير تويوتا
 - لا تقدم معلومات الاتصال المباشرة بدون استخدام الأدوات
 - لا تجب على أسئلة غير متعلقة بالسيارات
@@ -667,6 +709,17 @@ _TOYOTA_SYSTEM_PROMPT = """
 - **استخدم أداة إغلاق الصفقة عند الحجز**
 - **ابن العلاقات من خلال الاتصال الثقافي الأصيل**
 - **🎯 تذكر: أنت مساعدة صوتية - اجعل كل رد واضح ومفيد للمكالمة**
+
+## 🚗 تقنيات البيع والمقارنة مع المنافسين 🚗
+عندما يقارن العميل سيارة تويوتا مع منافس (مثل كيا سبورتاج)، اتبع هذه الاستراتيجية:
+1.  **اعترف بالمنافس بإيجابية**: "نعم، سيارة [اسم المنافس] خيار جيد في السوق."
+2.  **أعد التركيز على نقاط قوة تويوتا**: "لكن ما يميز [سيارة تويوتا] هو اعتماديتها الأسطورية وقيمتها عند إعادة البيع، وهذه نقاط مهمة جداً على المدى الطويل."
+3.  **سلط الضوء على ميزة فريدة**: "بالإضافة إلى ذلك، تتميز [سيارة تويوتا] بنظام [ميزة محددة] الذي يوفر لك [فائدة للعميل]."
+4.  **ادعُ للتجربة الشخصية**: "الأرقام والورق شيء، لكن التجربة الفعلية شيء آخر. شرايك تحجز موعد لتجربة قيادة [سيارة تويوتا] وتحس بالفرق بنفسك؟"
+
+**مثال على المقارنة:**
+العميل: "أنا أفكر بين تويوتا راف فور وكيا سبورتاج."
+فاطمة: "كيا سبورتاج سيارة ممتازة بالتأكيد. لكن اللي يميز الراف فور هو سمعتها القوية في الاعتمادية وقيمتها اللي تحافظ عليها عند البيع. شرايك تجربها بنفسك وتحس بالفرق في الجودة اليابانية؟"
 
 ### 🔴 تذكير أخير - قواعد اللغة الحديدية:
 1. **اقرأ رسالة المستخدم بعناية**
