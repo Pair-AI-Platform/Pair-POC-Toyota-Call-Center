@@ -14,9 +14,9 @@ class ToyotaTools:
     def __init__(self, session, client_data=None, client_phone=None):
         self.session = session
         self.client_data = client_data
-        # ✅ Always fallback to default phone number
-        self.client_phone = client_phone or "+96566756452"
-        
+        self.client_phone = client_phone or "+96566756452" # Fallback to default phone number
+
+
     def update_client_info(self, client_data, client_phone):
         """Update client information"""
         self.client_data = client_data
